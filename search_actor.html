@@ -6,11 +6,10 @@
     <p>This application allows you to search for an actress/actor&#39s name (ex. Bill Murray) and lists <br>
     the movies she/he has acted in chronological order. Search for any actor&#39s movie too.</p>
 
-    <input type="text" onkeyup="search(this.value)">
+    <input type="text" id="input" placeholder="Actor's name here...">
+    <button type="button" onclick="search()">Search</button>
     <br>
-    <!--button type="button" onclick="search()">Search</button>
-    <br-->
-    <p> Output: </p>
+    <p> Movies: </p>
     <textarea rows="8" cols="50" id="output"></textarea>
     <br>
 
