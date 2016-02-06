@@ -84,9 +84,7 @@
   }
 
   /**
-   *  The objects of this class consumes the TMDb API services depending 
-   *  on the URL passed on as reference to the class constructor in order 
-   *  to get necessary info about movies.
+   *  This class contains the logic to handle how the movies info is displayed.
    */
   class movies_outputter {
     public $movies_list;
@@ -97,7 +95,7 @@
       $this->movies_list = $movies_list;
     }
     /**
-     *  This method makes GET requests with curl to the TMDb API.
+     *  This method returns the info about movies in a string format.
      */
     public function string_output() {
       $string_response = "";
