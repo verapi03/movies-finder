@@ -7,7 +7,6 @@
   $movies_list[0]["movies"] = tmdb_parse_data::chronological_order($movies_list[0]["movies"]);
   $search_output = new movies_outputter($movies_list);
   echo $search_output->string_output();
-  // echo var_dump($movies_list);
 
   /**
    *  The objects of this class consumes the TMDb API services depending 
@@ -17,9 +16,6 @@
   class tmdb_api_call {
     protected $url;
     const api_key = "da978a15e0922d1624da0150e1a1fe19";
-    /**
-     *  Class constructor
-     */
     public function __construct($url) {
       $this->url = $url;
     }
@@ -43,9 +39,6 @@
    */
   class tmdb_parse_data {
     public $data;
-    /**
-     *  Class constructor
-     */
     public function __construct($data) {
       $this->data = $data;
     }
@@ -65,7 +58,7 @@
         foreach ($actor_features['known_for'] as $movie_info) {
           $actor['movies'][] = array(
             "title"=>$movie_info['original_title'], 
-            "release"=>strtotime($movie_info['release_date'])
+            "release"=>date_utilities::instance()->date_to_timestamp($movie_info['release_date'])
           );
         }
         $movies_by_actor[] = $actor;
@@ -88,9 +81,6 @@
    */
   class movies_outputter {
     public $movies_list;
-    /**
-     *  Class constructor
-     */
     public function __construct($movies_list) {
       $this->movies_list = $movies_list;
     }
@@ -103,11 +93,52 @@
         $string_response .= "Artist: ".$actor["name"]."\n";
         $string_response .= "Movies:\n";
         foreach ($actor["movies"] as $movies) {
-          // Check if $movies["release"] is timestamp and conver it back to date.
+          if (date_utilities::instance()->is_timestamp($movies["release"])) {
+            $movies["release"] = 
+              date_utilities::instance()->timestamp_to_date($movies["release"]);
+          }
           $string_response .= "Title: ".$movies["title"].". Release date: ".$movies["release"]."\n";
         }
       }
       return $string_response;
+    }
+  }
+
+  /**
+   *  This class defines a set of methods that perform common operations 
+   *  on date type variables.  
+   */
+  class date_utilities {
+    private static $instance = null;
+    private function __construct(){}
+    /** 
+     *  This method allows to create only one instance of the 
+     *  utility class.
+     */
+    public static function instance(){
+      if (self::$instance === null) {
+          self::$instance = new self();
+      }
+      return self::$instance;
+    }
+    /**
+     *  This method evaluates if there is anything else than digits 
+     *  inside the string so the string is not timestamp.
+     */
+    public static function is_timestamp($str) {
+      return !preg_match('/[^\d]/', $str);
+    }
+    /**
+     *  This method converts a timestamp input to the TMDb date format.
+     */
+    public static function timestamp_to_date($int) {
+      return date("Y-m-d", $int);
+    }
+    /**
+     *  This method converts a date format input to timestamp.
+     */
+    public static function date_to_timestamp($str) {
+      return strtotime($str);
     }
   }
 ?>
