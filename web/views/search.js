@@ -7,7 +7,6 @@ function search() {
   var xhttp = new XMLHttpRequest();
   var input = document.getElementById('input').value;
   var env = getEnv();
-  // console.log("env: ",env);
   if (!validateSearchInput(input)) { 
     return;
   }
@@ -18,17 +17,18 @@ function search() {
       renderOutput("Something went wrong with your request. Contact us at raul.andres.vp@gmail.com.");
     }
   };
-  xhttp.open("GET", env+"search.php?input="+input, true);
+  xhttp.open("GET", env+"controllers/search.php?input="+input, true);
   xhttp.send();
 }
 
 /**
- *  This function returns the environment in which the app is running.
+ *  This function returns the root directory in which the app 
+ *  is running.
  */
 function getEnv() {
   var scripts = document.getElementsByTagName('script');
   var script = scripts[scripts.length - 1].src;
-  return script.substring(0, script.lastIndexOf('/')) + '/';
+  return script.substring(0, script.lastIndexOf('views'));
 }
 
 /**
@@ -36,7 +36,7 @@ function getEnv() {
  *  first name and a last name of an actor.
  */
 function validateSearchInput(str) {
-  var pattern = /^([a-zA-Z]+ [a-zA-Z]+)$/;
+  var pattern = /^([a-zA-Z]+ [a-zA-Z]+)+/;
   if (!pattern.test(str)) { 
     alert("Please enter the first and last name of an actor (letters only).");
     return false;

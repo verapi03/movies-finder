@@ -1,0 +1,6 @@
+{
+  "name": "Movies Finder",
+  "description": "An elemental PHP app that makes use of the Silex web framework to deploy to Heroku",
+  "repository": "https://github.com/verapi85/movies-finder",
+  "addons": []
+}
