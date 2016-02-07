@@ -1,12 +1,23 @@
 <?php
-  $url_search = "https://api.themoviedb.org/3/search/person?&query=".urlencode($_REQUEST["input"]);
-  $object_search = new tmdb_api_call($url_search);
-  $arr_movies_search = json_decode($object_search->api_call_get(),true);
-  $object_parser = new tmdb_parse_data($arr_movies_search);
-  $movies_list = $object_parser->extract_movies_by_actor_search();
-  $movies_list[0]["movies"] = tmdb_parse_data::chronological_order($movies_list[0]["movies"]);
-  $search_output = new movies_outputter($movies_list);
-  echo $search_output->string_output();
+  try {
+    $user_input = $_REQUEST["input"];
+    $url_search = "https://api.themoviedb.org/3/search/person?&query=".urlencode($user_input);
+    $object_search = new tmdb_api_call($url_search);
+    $arr_movies_search = json_decode($object_search->get_call(),true);
+    $validator = new data_validator($user_input,$arr_movies_search);
+    $search_validated = $validator->search_validation();
+    $object_parser = new tmdb_parse_data($search_validated);
+    $movies_list = $object_parser->extract_movies_by_actor_search();
+    foreach ($movies_list as &$list) {
+      $list["movies"] = tmdb_parse_data::chronological_order($list["movies"]);
+    }
+    unset($list);
+    $search_output = new movies_outputter($movies_list);
+    echo $search_output->string_output();
+  }
+  catch(Exception $err) {
+    echo $err->getMessage();
+  }
 
   /**
    *  The objects of this class consumes the TMDb API services depending 
@@ -22,7 +33,7 @@
     /**
      *  This method makes GET requests with curl to the TMDb API.
      */
-    public function api_call_get() {
+    public function get_call() {
       $request =  $this->url.'&api_key='.self::api_key; 
       $ch = curl_init($request);
       curl_setopt($ch, CURLOPT_HEADER, false); 
@@ -30,6 +41,46 @@
       $curl_response = curl_exec($ch); 
       curl_close($ch); 
       return $curl_response;
+    }
+  }
+
+  /**
+   *  This is a helper class used to validate the ouput from the 
+   *  tmdb_api_call methods.
+   */
+  class data_validator {
+    public $user_input;
+    public $api_output;
+
+    public function __construct($user_input, $api_output) {
+      $this->user_input = $user_input;
+      $this->api_output = $api_output;
+    }
+    /**
+     *  This method validates the output of the search service of 
+     *  the TMDb API eliminating the data that corresponds to
+     *  actors who do not match the user input.
+     */
+    public function search_validation() {
+      $$misspelled_names = array();
+      if(empty($this->api_output['results'])) {
+        throw new Exception("Your input does not throw any results.");
+      }
+      foreach ($this->api_output['results'] as $key => $actor) {
+        if (strcmp(strtolower($actor['name']), strtolower($this->user_input)) === 0) {
+          if (empty($actor['known_for'])) {
+            unset($this->api_output['results'][$key]);
+          }
+        } else {
+          $misspelled_names[] = $actor['name'];
+          unset($this->api_output['results'][$key]);
+        }
+      }
+      if(empty($this->api_output['results'])) {
+        $possible_names = implode(" or ",array_unique($misspelled_names));
+        throw new Exception("Perhaps you mean ".$possible_names."?");
+      }
+      return $this->api_output;
     }
   }
 
@@ -99,6 +150,7 @@
           }
           $string_response .= "Title: ".$movies["title"].". Release date: ".$movies["release"]."\n";
         }
+        $string_response .= "\n";
       }
       return $string_response;
     }
