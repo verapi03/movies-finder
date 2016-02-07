@@ -17,7 +17,7 @@ function search() {
       renderOutput("Something went wrong with your request. Contact us at raul.andres.vp@gmail.com.");
     }
   };
-  xhttp.open("GET", "http://localhost/~andresvera/Alert-Logic/search.php?input="+input, true);
+  xhttp.open("GET", "http://tmdb.local/search.php?input="+input, true);
   xhttp.send();
 }
 
@@ -26,9 +26,9 @@ function search() {
  *  first name and a last name of an actor.
  */
 function validateSearchInput(str) {
-  var pattern = /^([a-zA-Z]+ [a-zA-Z]+)/;
+  var pattern = /^([a-zA-Z]+ [a-zA-Z]+)$/;
   if (!pattern.test(str)) { 
-    alert("Please enter the first and last name of an actor.");
+    alert("Please enter the first and last name of an actor (letters only).");
     return false;
   }
   return true;

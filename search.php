@@ -62,7 +62,7 @@
      *  actors who do not match the user input.
      */
     public function search_validation() {
-      $$misspelled_names = array();
+      $misspelled_names = array();
       if(empty($this->api_output['results'])) {
         throw new Exception("Your input does not throw any results.");
       }
