@@ -5,8 +5,9 @@
  */
 function search() {
   var xhttp = new XMLHttpRequest();
-  var input = document.getElementById("input").value;
-  // console.log("input: ",input);
+  var input = document.getElementById('input').value;
+  var env = getEnv();
+  // console.log("env: ",env);
   if (!validateSearchInput(input)) { 
     return;
   }
@@ -17,8 +18,17 @@ function search() {
       renderOutput("Something went wrong with your request. Contact us at raul.andres.vp@gmail.com.");
     }
   };
-  xhttp.open("GET", "http://tmdb.local/search.php?input="+input, true);
+  xhttp.open("GET", env+"search.php?input="+input, true);
   xhttp.send();
+}
+
+/**
+ *  This function returns the environment in which the app is running.
+ */
+function getEnv() {
+  var scripts = document.getElementsByTagName('script');
+  var script = scripts[scripts.length - 1].src;
+  return script.substring(0, script.lastIndexOf('/')) + '/';
 }
 
 /**
