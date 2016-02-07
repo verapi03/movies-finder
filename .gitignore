@@ -1,0 +1,8 @@
+# generic files to ignore
+*.DS_Store
+.DS_Store
+
+# composer and keenio files to ignore
+composer.phar
+vendor
+vendor/*
