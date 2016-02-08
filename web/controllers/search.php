@@ -108,7 +108,7 @@
         $actor['movies'] = array();
         foreach ($actor_features['known_for'] as $movie_info) {
           $actor['movies'][] = array(
-            "title"=>$movie_info['original_title'], 
+            "title"=>$movie_info['original_title'] ? $movie_info['original_title'] : $movie_info['original_name'], 
             "release"=>date_utilities::instance()->date_to_timestamp($movie_info['release_date'])
           );
         }
@@ -148,7 +148,8 @@
             $movies["release"] = 
               date_utilities::instance()->timestamp_to_date($movies["release"]);
           }
-          $string_response .= "Title: ".$movies["title"].". Release date: ".$movies["release"]."\n";
+          $release = $movies["release"] ? $movies["release"] : "Not available.";
+          $string_response .= "Title: ".$movies["title"].". Release date: ".$release."\n";
         }
         $string_response .= "\n";
       }
@@ -174,11 +175,11 @@
       return self::$instance;
     }
     /**
-     *  This method evaluates if there is anything else than digits 
-     *  inside the string so the string is not timestamp.
+     *  This method evaluates if the input is a number or a numeric
+     *  string otherwise the string is not timestamp.
      */
-    public static function is_timestamp($str) {
-      return !preg_match('/[^\d]/', $str);
+    public static function is_timestamp($var) {
+      return is_numeric($var);
     }
     /**
      *  This method converts a timestamp input to the TMDb date format.
